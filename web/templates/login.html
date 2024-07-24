@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EMS-ADMIN|登录</title>
+    <link rel="stylesheet" href="../static/layui/css/layui.css">
+</head>
+<body class="body">
+<div class="loginForm">
+    <div style="height: 80px;">
+        <h1>登    录</h1>
+    </div>
+    <form class="layui-form" style="width: 300px;" action="">
+        <div class="layui-form-item">
+            <input type="text" class="layui-input" name="username" lay-verify="required" placeholder="请输入用户名" autocomplete="off">
+        </div>
+        <div class="layui-form-item">
+            <input type="password" class="layui-input" name="password" lay-verify="required" placeholder="请输入密码" autocomplete="off">
+        </div>
+        <div class="layui-form-item">
+            <input type="text" class="layui-input" style="width: 175px;" name="code" lay-verify="required" placeholder="验证码" autocomplete="off">
+            <div class="layui-input-suffix" style="right: 100px;">
+                <img src="{{.b64s}}" id="captchaImage" onclick="refreshCode()" style="cursor: pointer;">
+            </div>
+            <input type="hidden" name="uuid" id="uuid" value="{{.captchaId}}">
+        </div>
+        <div class="layui-form-item">
+            <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="login-submit">登    录</button>
+        </div>
+    </form>
+</div>
+
+<script src="../static/layui/layui.js"></script>
+<script src="../static/common/https.js"></script>
+<script src="../static/common/common.js"></script>
+<script>
+    layui.use(function () {
+        const form = layui.form;
+        const layer = layui.layer;
+        //  刷新验证码
+        function refreshCode() {
+            get('/captcha', {}).then(res => {
+                document.getElementById('captchaImage').src = res.b64s;
+                document.getElementById('uuid').value = res.captchaId
+            })
+        }
+
+        //  登录
+        form.on('submit(login-submit)', function (data) {
+            const field = data.field;
+            post('/auth/login', field).then(res => {
+                if (res.success){
+                    successMsg(layer, res.data)
+                } else {
+                    errorMsg(res.msg)
+                }
+            }).finally(() => {
+                refreshCode()
+            })
+            return false;
+        })
+
+        window.refreshCode = function () {
+            refreshCode()
+        }
+    })
+</script>
+</body>
+<style>
+    .body{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100%;
+        background-image: url("../static/image/background.jpg");
+    }
+
+    .loginForm{
+        display: flex;
+        flex-flow: column;
+        justify-content: center;
+        align-items: center;
+        width: 400px;
+        height: 400px;
+        background: rgb(255, 255, 255);
+    }
+</style>
+</html>
