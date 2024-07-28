@@ -6,6 +6,7 @@ import (
 	"ems-adming-go/pkg/utils/captchauitl"
 	"ems-adming-go/pkg/utils/responseutil"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"net/http"
 )
@@ -53,7 +54,13 @@ func (h LoginHandler) HandleLogin(context *gin.Context) {
 	if err != nil {
 		context.JSON(http.StatusOK, responseutil.FailResponse(err.Error()))
 	}
+
 	if sysUser != nil {
+		err = bcrypt.CompareHashAndPassword([]byte(sysUser.Password), []byte(loginRequest.Password))
+		if err != nil {
+			context.JSON(http.StatusOK, responseutil.FailResponse("账号或密码错误"))
+			return
+		}
 		context.JSON(http.StatusOK, responseutil.SuccessResponse("登录成功"))
 		return
 	} else {
