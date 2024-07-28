@@ -48,7 +48,12 @@ func (h LoginHandler) HandleLogin(context *gin.Context) {
 		context.JSON(http.StatusOK, responseutil.FailResponse("验证码错误"))
 		return
 	}
-	if loginRequest.Username == "admin" && loginRequest.Password == "123456" {
+	//	获取当前用户
+	sysUser, err := service.FindByName(loginRequest.Username)
+	if err != nil {
+		context.JSON(http.StatusOK, responseutil.FailResponse(err.Error()))
+	}
+	if sysUser != nil {
 		context.JSON(http.StatusOK, responseutil.SuccessResponse("登录成功"))
 		return
 	} else {

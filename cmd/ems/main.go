@@ -8,7 +8,10 @@ import (
 func main() {
 
 	//	初始化数据库
-	config.Init()
+	if err := config.InitDB(); err != nil {
+		println("数据库初始化失败")
+	}
+	defer config.CloseDB()
 	//	初始化路由
 	router := handler.SetupRoutes()
 
