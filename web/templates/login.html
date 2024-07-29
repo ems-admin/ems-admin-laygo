@@ -50,7 +50,7 @@
             const field = data.field;
             post('/auth/login', field).then(res => {
                 if (res.success){
-                    successMsg(layer, res.data)
+                    console.log(res)
                 } else {
                     errorMsg(res.msg)
                 }

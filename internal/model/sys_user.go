@@ -11,4 +11,6 @@ type SysUser struct {
 	Enabled    bool      `xorm:"bit(1)"`
 	CreateTime time.Time `xorm:"datetime"`
 	updateTime time.Time `xorm:"datetime"`
+
+	Roles string `xorm:"-"` //	角色 Ids
 }

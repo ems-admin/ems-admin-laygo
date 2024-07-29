@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"ems-adming-go/internal/config"
 	"ems-adming-go/internal/model"
 	"ems-adming-go/internal/service"
 	"ems-adming-go/pkg/utils/captchauitl"
@@ -61,7 +62,15 @@ func (h LoginHandler) HandleLogin(context *gin.Context) {
 			context.JSON(http.StatusOK, responseutil.FailResponse("账号或密码错误"))
 			return
 		}
-		context.JSON(http.StatusOK, responseutil.SuccessResponse("登录成功"))
+		tokenString, err := config.GenerateJWT(*sysUser)
+		if err != nil {
+			context.JSON(http.StatusOK, responseutil.FailResponse(err.Error()))
+		}
+		result := make(map[string]interface{})
+		result["token"] = tokenString
+		result["username"] = sysUser.Username
+		result["nickName"] = sysUser.NickName
+		context.JSON(http.StatusOK, responseutil.SuccessResponse(result))
 		return
 	} else {
 		context.JSON(http.StatusOK, responseutil.FailResponse("账号或密码错误"))
